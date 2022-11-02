@@ -28,10 +28,12 @@ namespace VirtualDiskTest
             Console.WriteLine("File-size: " + file.Size);
             File.WriteAllBytes(@"C:\Users\trauni\Downloads\susy.txt", file.ReadAllBytes());
 
-            disk = disk.Clone();
+            //disk = disk.Clone();
 
             List<string> sussyGussy = new List<string>() { "sss", "sdsdsd" };
             sussyGussy.Foreach(x => Console.WriteLine(x));
+            var ss = sussyGussy.Clone();
+            ss.Foreach(x => Console.WriteLine(x));
 
             disk.CreateDirectory(@"V:\pics");
             disk.FileWriteAllBytes(@"V:\configs\pic.png", File.ReadAllBytes(@"C:\Users\trauni\Downloads\project_20221021_1855366-01_2 - Copy.png"));

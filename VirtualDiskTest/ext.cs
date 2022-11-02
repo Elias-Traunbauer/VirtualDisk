@@ -17,7 +17,7 @@ namespace VirtualDiskTest
         /// <typeparam name="T"></typeparam>
         /// <param name="collection">Input collection</param>
         /// <param name="action">Action to execute on collections items</param>
-        public static void Foreach<T>(this IEnumerable<T> collection, Action<T> action) where T : IEnumerable<T>
+        public static void Foreach<T>(this IEnumerable<T> collection, Action<T> action)
         {
             foreach (var item in collection)
             {
@@ -33,7 +33,7 @@ namespace VirtualDiskTest
         /// <param name="collection">Input collection</param>
         /// <param name="func">Function to calculate result object</param>
         /// <returns>Collection of results</returns>
-        public static IEnumerable<R> ForeachReturn<T, R>(this IEnumerable<T> collection, Func<T, R> func) where T : IEnumerable<T>
+        public static IEnumerable<R> ForeachReturn<T, R>(this IEnumerable<T> collection, Func<T, R> func)
         {
             List<R> list = new List<R>();
             foreach (var item in collection)
@@ -221,6 +221,44 @@ namespace VirtualDiskTest
             object[] conParams = new object[obj.GetType().GetConstructors().Length == 0 ? 0 : obj.GetType().GetConstructors()[0].GetParameters().Length];
 
             T clone = (T)Activator.CreateInstance(typeof(T), conParams)!;
+
+            var propsOrig = obj.GetType().GetProperties((BindingFlags.NonPublic | BindingFlags.Public));
+
+            var fieldsOrig = obj.GetType().GetFields((BindingFlags.NonPublic | BindingFlags.Public));
+
+            foreach (var fields in fieldsOrig)
+            {
+                fields.SetValue(clone, fields.GetValue(obj));
+            }
+
+            foreach (var props in propsOrig)
+            {
+                if (props.SetMethod != null)
+                {
+                    props.SetValue(clone, props.GetValue(obj));
+                }
+            }
+
+            return clone!;
+        }
+
+        /// <summary>
+        /// Creates an exact clone of the given object
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="obj">Object to clone</param>
+        /// <returns>Cloned object</returns>
+        /// <exception cref="ArgumentNullException">Throws if object to clone is null</exception>
+        public static T CloneSimple<T>(this T obj) where T : class, new()
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException("Parameter \"obj\" cannot be null.");
+            }
+
+            object[] conParams = new object[obj.GetType().GetConstructors().Length == 0 ? 0 : obj.GetType().GetConstructors()[0].GetParameters().Length];
+
+            T clone = new();
 
             var propsOrig = obj.GetType().GetProperties((BindingFlags.NonPublic | BindingFlags.Public) & BindingFlags.Instance);
 
