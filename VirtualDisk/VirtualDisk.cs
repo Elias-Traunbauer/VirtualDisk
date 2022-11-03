@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -573,7 +574,23 @@ namespace VirtualFilesystem
 
         private void EvaluateBlock(byte[] data, out long nextBlock, out byte[] fileData)
         {
-            nextBlock = BitConverter.ToInt64(data[0..settings.PointerSize]);
+            if (settings.PointerSize == 1)
+            {
+                nextBlock = data[0];
+            }
+            else if (settings.PointerSize == 2)
+            {
+                nextBlock = BitConverter.ToInt16(data[0..settings.PointerSize]);
+            }
+            else if (settings.PointerSize == 4)
+            {
+                nextBlock = BitConverter.ToInt32(data[0..settings.PointerSize]);
+            }
+            else
+            {
+                nextBlock = BitConverter.ToInt64(data[0..settings.PointerSize]);
+            }
+            
             fileData = data[settings.BlockDataIndex..];
         }
 
